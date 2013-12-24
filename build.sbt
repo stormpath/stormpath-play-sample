@@ -15,10 +15,13 @@ libraryDependencies ++= Seq(
   javaCore,  // The core Java API
   // WebJars pull in client-side web libraries
   "org.webjars" %% "webjars-play" % "2.2.0",
-  "org.webjars" % "bootstrap" % "2.3.1"
+  "org.webjars" % "bootstrap" % "2.3.1",
+  "com.stormpath.sdk" % "stormpath-sdk-api" % "0.9.0",
+  "com.stormpath.sdk" % "stormpath-sdk-httpclient" % "0.9.0",
+  "com.stormpath.scala" % "stormpath-scala-core_2.10" % "1.0-SNAPSHOT"
   // Add your own project dependencies in the form:
   // "group" % "artifact" % "version"
 )
 
-//play.Project.playScalaSettings
-playJavaSettings
+play.Project.playScalaSettings
+//playJavaSettings
