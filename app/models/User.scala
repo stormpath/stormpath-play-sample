@@ -1,34 +1,41 @@
 package models
 
+import play.api.db._
 import play.api.Play.current
+
+import anorm._
+import anorm.SqlParser._
 
 import scala.language.postfixOps
 import com.stormpath.sdk.client.{ClientBuilder, Client}
 import com.stormpath.sdk.application.Application
+import scala.sys.SystemProperties
+import play.api.Logger
+
+//import scala.Application
 import com.stormpath.sdk.account.Account
 import com.stormpath.sdk.authc.UsernamePasswordRequest
-
-import scala.language.postfixOps
 
 case class User(email: String, name: String, password: String)
 
 object User {
 
+  
   // -- Parsers
-
+  
   /**
    * Parse a User from a ResultSet
    */
-  val simple = {
-    get[String]("user.email") ~
-      get[String]("user.name") ~
-      get[String]("user.password") map {
-      case email~name~password => User(email, name, password)
-    }
-  }
-
+//  val simple = {
+//    get[String]("user.email") ~
+//    get[String]("user.name") ~
+//    get[String]("user.password") map {
+//      case email~name~password => User(email, name, password)
+//    }
+//  }
+  
   // -- Queries
-
+  
   /**
    * Retrieve a User from email.
    */
@@ -39,7 +46,7 @@ object User {
 //      ).as(User.simple.singleOpt)
 //    }
 //  }
-
+  
   /**
    * Retrieve all users.
    */
@@ -48,7 +55,7 @@ object User {
 //      SQL("select * from user").as(User.simple *)
 //    }
 //  }
-
+  
   /**
    * Authenticate a User.
    */
@@ -65,48 +72,48 @@ object User {
 //      ).as(User.simple.singleOpt)
 //    }
 
-    var applicationRestUrl : String = "https://api.stormpath.com/v1/applications/3TqbyZ1qo74eDM4gTo2H94"
+    val applicationRestUrl = "https://api.stormpath.com/v1/applications/3TqbyZ1qo74eDM4gTo2H94"
 
-    var path : String = System.getProperty("user.home") + "/.stormpath/apiKey.properties"
+    val path = util.Properties.envOrNone("HOME").get + "/.stormpath/apiKey.properties"
 
-    var client : Client = new ClientBuilder().setApiKeyFileLocation(path).build()
+    val client = new ClientBuilder().setApiKeyFileLocation(path).build()
 
-    var application : Application = client.getResource(applicationRestUrl, classOf[Application])
+    val application = client.getResource(applicationRestUrl, classOf[Application])
 
     try {
 
-      var account : Account = application.authenticateAccount(new UsernamePasswordRequest(email, password, null)).getAccount()
+      val account = application.authenticateAccount(new UsernamePasswordRequest(email, password, null)).getAccount()
+      Some(User(email, "", password))
 
     } catch {
 
-      case e: Exception => false
+      case e: Exception => Logger.info(e.getMessage)
+      None
+
     }
 
-    //User(email, "", password).singleOpt
-    Option(User(email, "", password))
-
   }
-
-//  /**
-//   * Create a User.
-//   */
-//  def create(user: User): User = {
-//    DB.withConnection { implicit connection =>
-//      SQL(
-//        """
-//          insert into user values (
-//            {email}, {name}, {password}
-//          )
-//        """
-//      ).on(
-//        "email" -> user.email,
-//        "name" -> user.name,
-//        "password" -> user.password
-//      ).executeUpdate()
-//
-//      user
-//
-//    }
-//  }
-
+   
+  /**
+   * Create a User.
+   */
+  def create(user: User): User = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          insert into user values (
+            {email}, {name}, {password}
+          )
+        """
+      ).on(
+        "email" -> user.email,
+        "name" -> user.name,
+        "password" -> user.password
+      ).executeUpdate()
+      
+      user
+      
+    }
+  }
+  
 }
