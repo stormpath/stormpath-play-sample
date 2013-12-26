@@ -18,7 +18,7 @@ object Projects extends Controller with Secured {
   /**
    * Display the dashboard.
    */
-  def index = IsAuthenticated { username => _ =>
+  //def index = IsAuthenticated { username => _ =>
 //    User.findByEmail(username).map { user =>
 //      Ok(
 //        html.dashboard(
@@ -29,14 +29,30 @@ object Projects extends Controller with Secured {
 //      )
 //    }.getOrElse(Forbidden)
 
-    Ok(
-      html.dashboard(
-        Project.findInvolving(username),
-        Task.findTodoInvolving(username),
-        null
-      )
-    )
+//  def index = IsAuthenticated { username => implicit request =>
+//    Form("login" -> nonEmptyText).bindFromRequest.fold(
+//      errors => BadRequest,
+//      folder => Ok(
+//      html.dashboard(
+//        Project.findInvolving(username),
+//        Task.findTodoInvolving(username),
+//        //User(username, session.get("username").get, "")
+//        User(username, "", "")
+//      )
+//    )
+//    )
+//  }
+
+  def index = IsAuthenticated { email => implicit request =>
+    //play.Logger.info("email: " + session.get("email").get)
+    Ok(html.dashboard(
+      Project.findInvolving(email),
+      Task.findTodoInvolving(email),
+      //session +("username", user.get.name)
+      User(email, session.get("username").get, "")
+    ))
   }
+
 
   // -- Projects
 

@@ -83,7 +83,7 @@ object User {
     try {
 
       val account = application.authenticateAccount(new UsernamePasswordRequest(email, password, null)).getAccount()
-      Some(User(email, "", password))
+      Some( User(account.getEmail, account.getUsername, "") )
 
     } catch {
 
@@ -97,23 +97,23 @@ object User {
   /**
    * Create a User.
    */
-  def create(user: User): User = {
-    DB.withConnection { implicit connection =>
-      SQL(
-        """
-          insert into user values (
-            {email}, {name}, {password}
-          )
-        """
-      ).on(
-        "email" -> user.email,
-        "name" -> user.name,
-        "password" -> user.password
-      ).executeUpdate()
-      
-      user
-      
-    }
-  }
+//  def create(user: User): User = {
+//    DB.withConnection { implicit connection =>
+//      SQL(
+//        """
+//          insert into user values (
+//            {email}, {name}, {password}
+//          )
+//        """
+//      ).on(
+//        "email" -> user.email,
+//        "name" -> user.name,
+//        "password" -> user.password
+//      ).executeUpdate()
+//
+//      user
+//
+//    }
+//  }
   
 }

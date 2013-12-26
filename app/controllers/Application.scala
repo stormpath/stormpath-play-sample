@@ -10,14 +10,33 @@ import views._
 
 object Application extends Controller {
 
+  var loggedUser : Option[User] = None
+
   // -- Authentication
 
-  val loginForm = Form(
+//  val loginForm = Form (
+//    tuple(
+//      "email" -> text,
+//      "password" -> text
+//    ) verifying ("Invalid email or password", result => result match {
+//      case (email, password) => {
+//        val user = User.authenticate(email, password)
+//        //session +("username", user.get.name)
+//        user.isDefined
+//      }
+//    })
+//  )
+
+  def updatePasswordForm(implicit request: Request[_]) = Form(
     tuple(
       "email" -> text,
       "password" -> text
     ) verifying ("Invalid email or password", result => result match {
-      case (email, password) => User.authenticate(email, password).isDefined
+      case (email, password) => {
+        val user = User.authenticate(email, password)
+        loggedUser = user
+        user.isDefined
+      }
     })
   )
 
@@ -25,17 +44,31 @@ object Application extends Controller {
    * Login page.
    */
   def login = Action { implicit request =>
-    Ok(html.login(loginForm))
+    //Ok(html.login(loginForm))
+    Ok(html.login(updatePasswordForm))
   }
 
   /**
    * Handle login form submission.
    */
   def authenticate = Action { implicit request =>
-    loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.login(formWithErrors)),
-      user => Redirect(routes.Projects.index).withSession("email" -> user._1)
-    )
+    //play.Logger.info(request.session + ("username" -> "aaaa") get "username" get)
+    //val session = request.session + ("username" -> "aaaa")
+    //play.Logger.info("11session empty?: " + request.session.isEmpty)
+    //request.session.get("username").map { username => play.Logger.info("username33: " + username) }
+    updatePasswordForm.bindFromRequest.fold(
+      formWithErrors => {
+        loggedUser = None
+        BadRequest(html.login(formWithErrors))
+      },
+      //user => Redirect(routes.Projects.index).withSession("email" -> user._1)
+      //user => Redirect(routes.Projects.index).withSession("email" -> user.asInstanceOf[User].email, "username" -> user.asInstanceOf[User].name)
+      user => {
+        //Redirect(routes.Projects.index).withSession("email" -> user.asInstanceOf[User].email, "username" -> user.asInstanceOf[User].name)
+        //play.Logger.info("session: " + session)
+        Redirect(routes.Projects.index).withSession("email" -> user._1, "username" -> loggedUser.get.name)
+      }
+    );
   }
 
   /**
