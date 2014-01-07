@@ -1,4 +1,4 @@
-@(projects: Seq[Project], user: User)(body: Html)
+@(email: String, fullName: String)(body: Html)
 
 <html>
     <head>
@@ -10,28 +10,20 @@
         <script type="text/javascript" src="@routes.Assets.at("javascripts/underscore-min.js")"></script>
         <script type="text/javascript" src="@routes.Assets.at("javascripts/backbone-min.js")"></script>
         <script type="text/javascript" src="@routes.Assets.at("javascripts/main.js")"></script>
-        <script type="text/javascript" src="@routes.Application.javascriptRoutes"></script>
+        <script type="text/javascript" src="@routes.MainController.javascriptRoutes"></script>
     </head>
     <body>
         <header>
-            <a href="@routes.Projects.index" id="logo"><span>Storm</span>path</a>
+            <a href="@routes.CustomDataController.index" id="logo"><span>Storm</span>path</a>
             <dl id="user">
-                <dt>@user.name <span>(@user.email)</span></dt>
+                <dt>@fullName <span>(@email)</span></dt>
                 <dd>
-                    <a href="@routes.Application.logout()">Logout</a>
+                    <a href="@routes.MainController.logout()">Logout</a>
                 </dd>
             </dl>
         </header>
         <nav>
             <h4 class="dashboard"><a href="#/">Dashboard</a></h4>
-            <ul id="projects">
-                @projects.groupBy(_.folder).map {
-                    case (group, projects) => {
-                        @views.html.projects.group(group, projects)
-                    }
-                }
-            </ul>
-            <button id="newGroup">New group</button>
         </nav>
         <section id="main">
             @body

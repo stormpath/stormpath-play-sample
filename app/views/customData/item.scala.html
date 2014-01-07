@@ -1,0 +1,14 @@
+@(customDataItem: CustomDataItem)
+
+<li customdata-item-id="@customDataItem.key">
+
+    <h4>@customDataItem.key</h4>
+
+    <span class="value">@customDataItem.value</span>
+
+    <a class="deleteItem" id="@customDataItem.key" href="@routes.CustomDataController.deleteCustomDataItem(customDataItem.key)">Delete task</a>
+    <span class="loader">Loading</span>
+
+</li>
+
+

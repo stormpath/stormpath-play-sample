@@ -1,0 +1,20 @@
+@(customDataItem: Seq[CustomDataItem] = Nil)
+
+<div class="folder">
+    <header>
+    <h3>Custom Data</h3>
+    </header>
+    <ul class="list">
+        @customDataItem.map { task =>
+            @if(!task.key.equals("href") && !task.key.equals("createdAt") && !task.key.equals("modifiedAt")) {
+                @views.html.customData.item(task)
+            }
+        }
+    </ul>
+    <form class="addItem">
+        <input type="text" name="key" placeholder="New Key..." />
+        <input type="text" name="value" placeholder="New Value..." />
+        <input type="submit" />
+    </form>
+</div>
+
