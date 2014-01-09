@@ -21,7 +21,7 @@ import models.User
 import collection.JavaConversions._
 import com.stormpath.sdk.directory.CustomData
 import play.api.Play.current
-import com.stormpath.scala.provider.StormpathAuthenticationService
+import com.stormpath.scala.service.StormpathAuthenticationService
 import context.StormpathExecutionContext
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._

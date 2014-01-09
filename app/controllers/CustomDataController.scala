@@ -22,13 +22,15 @@ import play.api.data.Forms._
 
 import models._
 import views._
-import scala.concurrent.{ExecutionContext, Future}
-import ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import context.StormpathExecutionContext
 
 /**
  * Manage custom data related operations.
  */
 object CustomDataController extends Controller with Secured {
+
+  implicit val executionContext = StormpathExecutionContext.executionContext
 
   val customDataForm = Form(
     tuple(
