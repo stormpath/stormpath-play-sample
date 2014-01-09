@@ -31,7 +31,7 @@ object StormpathManager {
   private val path = util.Properties.envOrNone("HOME").get + "/.stormpath/apiKey.properties"
   private val client = new ClientBuilder().setApiKeyFileLocation(path).build()
   val config = play.api.Play.configuration
-  val applicationRestUrl = config.getString("applicationRestUrl").getOrElse("Undefined Application Rest URL")
+  val applicationRestUrl = config.getString("applicationRestUrl").getOrElse {""}
   val service = new StormpathAuthenticationService(client, applicationRestUrl)
   implicit val executionContext = StormpathExecutionContext.executionContext
 
@@ -49,7 +49,7 @@ object StormpathManager {
     Some( User(account.get.getEmail, account.get.getFullName, account.get.getUsername, account.get.getCustomData.getHref ))
   }
 
-  //TODO: This should be a future called via Ajax after login
+  //TODO: This should be a future invoked via Ajax after login
   def getCustomData(href: String) : Map[String, String] = {
     val customData = client.getResource(href, classOf[CustomData])
     customData.map(i => i._1 -> i._2.toString).toMap
