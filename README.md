@@ -1,2 +1,2 @@
-stormpath-play
-==============
+stormpath-play-sample
+=====================
