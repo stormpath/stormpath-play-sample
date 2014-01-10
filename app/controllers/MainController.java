@@ -1,35 +1,12 @@
 package controllers;
 
-import play.mvc.*;
-import play.data.*;
-import static play.data.Form.*;
-
-import views.html.*;
+import play.mvc.Controller;
+import play.mvc.Result;
 
 public class MainController extends Controller {
     
     public static Result index() {
-        return ok(index.render("Hello from Java"));
+        return ok(views.html.index.render("Hello from Java"));
     }
-
-    /**
-     * Login page.
-     */
-    public static Result login() {
-        return ok(
-                login.render(form(Login.class))
-        );
-    }
-
-    public static Result authenticate() {
-        Form<Login> loginForm = form(Login.class).bindFromRequest();
-        return ok();
-    }
-
-
-    public static class Login {
-        public String email;
-        public String password;
-    }
-
+    
 }

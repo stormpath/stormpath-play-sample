@@ -1,6 +1,4 @@
-import play.Project._
-
-name := "stormpath-play"
+name := """stormpath-play"""
 
 version := "1.0-SNAPSHOT"
 
@@ -20,5 +18,4 @@ libraryDependencies ++= Seq(
   // "group" % "artifact" % "version"
 )
 
-//play.Project.playScalaSettings
-playJavaSettings
+play.Project.playScalaSettings
