@@ -29,15 +29,14 @@ object MainController extends Controller {
 
   var loggedUser : Option[User] = None
 
-  def updatePasswordForm(implicit request: Request[_]) = Form(
+  def loginForm(implicit request: Request[_]) = Form(
     tuple(
       "email" -> text,
       "password" -> text
     ) verifying ("Invalid email or password", result => result match {
       case (email, password) => {
-        val user = User.authenticate(email, password)
-        loggedUser = user
-        user.isDefined
+        loggedUser = User.authenticate(email, password)
+        loggedUser.isDefined
       }
     })
   )
@@ -46,14 +45,14 @@ object MainController extends Controller {
    * Login page.
    */
   def login = Action { implicit request =>
-    Ok(html.login(updatePasswordForm))
+    Ok(html.login(loginForm))
   }
 
   /**
    * Handle login form submission.
    */
   def authenticate = Action { implicit request =>
-    updatePasswordForm.bindFromRequest.fold(
+    loginForm.bindFromRequest.fold(
       formWithErrors => {
         loggedUser = None
         BadRequest(html.login(formWithErrors))
@@ -102,12 +101,11 @@ trait Secured {
    */
   private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.MainController.login)
   
-  // --
-  
-  /** 
+  /**
    * Action for authenticated users.
    */
-  def IsAuthenticated(f: => String => Request[AnyContent] => Future[SimpleResult]) = Security.Authenticated(username, onUnauthorized) { user =>
+  def IsAuthenticated(f: => String => Request[AnyContent] => Future[SimpleResult]) =
+    Security.Authenticated(username, onUnauthorized) { user =>
     Action.async { request =>
       username(request).map { login =>
         f(login)(request)

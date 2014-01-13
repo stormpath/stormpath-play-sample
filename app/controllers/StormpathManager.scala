@@ -23,30 +23,39 @@ import com.stormpath.sdk.directory.CustomData
 import play.api.Play.current
 import com.stormpath.scala.service.StormpathAuthenticationService
 import context.StormpathExecutionContext
-import scala.concurrent.{Future, Await}
+import scala.concurrent.{TimeoutException, Future, Await}
 import scala.concurrent.duration._
+import java.util.concurrent.TimeUnit
 
 object StormpathManager {
 
   private val path = util.Properties.envOrNone("HOME").get + "/.stormpath/apiKey.properties"
   private val client = new ClientBuilder().setApiKeyFileLocation(path).build()
-  val config = play.api.Play.configuration
-  val applicationRestUrl = config.getString("applicationRestUrl").getOrElse {""}
-  val service = new StormpathAuthenticationService(client, applicationRestUrl)
-  implicit val executionContext = StormpathExecutionContext.executionContext
+  private val config = play.api.Play.configuration
+  private val applicationRestUrl = config.getString("applicationRestUrl").getOrElse("")
+  private val service = new StormpathAuthenticationService(client, applicationRestUrl)
+  private implicit val executionContext = StormpathExecutionContext.executionContext
+  private val authenticationTimeout : Long = config.getLong("authenticationTimeout").getOrElse(30)
 
   def authenticate(email: String, password: String) : Option[User] = {
 
     val accountFuture = service.doAuthenticate(email, password)
 
-    val account = Await.result(accountFuture, 30 seconds)
+    try {
+      val account = Await.result(accountFuture, Duration(authenticationTimeout, TimeUnit.SECONDS) )
 
-    if (account.isFailure) {
-      play.Logger.debug(account.failed.get.getMessage)
-      return None
+      if (account.isFailure) {
+        play.Logger.debug(account.failed.get.getMessage)
+        return None
+      }
+      return Some( User(account.get.getEmail, account.get.getFullName, account.get.getUsername, account.get.getCustomData.getHref ))
+
+    } catch {
+      case e: TimeoutException => {
+        play.Logger.warn(e.getMessage)
+        return None
+      }
     }
-
-    Some( User(account.get.getEmail, account.get.getFullName, account.get.getUsername, account.get.getCustomData.getHref ))
   }
 
   //TODO: This should be a future invoked via Ajax after login
