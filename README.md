@@ -33,17 +33,15 @@ git clone git@github.com:stormpath/stormpath-play-sample.git
 
 ## Running the Sample Application ##
 
-1. This project requires [Play 2.2.1](http://www.playframework.com/download) to build and run. Run the following from a command prompt:
+1. This project uses the [Typesafe Activator](http://typesafe.com/activator) to build and run. You just need to execute:
 
 ```bash
-play
+cd stormpath-play-sample
+./activator ui
 ```
 
-2. Run the app:
+The activator UI will start in your browser and the source code will be compiled. Once it finishes, the sample app will be automatically started.
 
-```bash
-run
-```
 
 ### Usage Instructions ###
 
@@ -52,3 +50,12 @@ Once it is running, open the following url in your web browser: `http://localhos
 After a successful login, the web app will display the existing [custom data](http://docs.stormpath.com/rest/product-guide/#custom-data) for this account. Fields can be deleted and added to it.
 
 You can close your web session by clicking on the upper-right "logout" button or going to `http://localhost:8080/logout`.
+
+
+## Change Log
+
+### 0.1.0
+
+- Stormpath SDK dependency to latest stable release of 0.9.2
+- Provides a wepbage to view and edit account's custom data
+- Can be run via the Typesafe Activator

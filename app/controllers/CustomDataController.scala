@@ -26,12 +26,15 @@ import scala.concurrent.Future
 import context.StormpathExecutionContext
 
 /**
- * Manage custom data related operations.
+ * Handles Custom Data-related requests only allowed to authenticated users.
+ *
  */
 object CustomDataController extends Controller with Secured {
 
+  // ExecutionContext to handle how and when the asynchronous computation is executed.
   implicit val executionContext = StormpathExecutionContext.executionContext
 
+  //Form to hold custom data field insertion requests data
   val customDataForm = Form(
     tuple(
       "key" -> nonEmptyText,
@@ -39,6 +42,11 @@ object CustomDataController extends Controller with Secured {
     )
   )
 
+  /**
+   * Handles account's custom data retrieval. The actual retrieval operation is delegated to {@link CustomDataModel}.
+   *
+   * @return the html page to load.
+   */
   def index = IsAuthenticated { username => implicit request =>
     val future = Future {
       CustomDataModel.getCustomData(request.session.get("customDataHref").get)
@@ -52,7 +60,15 @@ object CustomDataController extends Controller with Secured {
   }
 
   /**
-   * Add a custom data item.
+   * This method will insert or update a custom data field into the custom data of the logged in account. When the
+   * key does not previously exist, the field is created. If the key already exists, the existing value will be replaced with
+   * the newly entered value.
+   * </pre>
+   * The actual addition operation is delegated to {@link CustomDataModel}.
+   * <pre/>
+   * This method is restricted to authenticated users only.
+   *
+   * @return the result of the insertion operation
    */
   def addCustomDataItem() = IsAuthenticated { username => implicit request =>
     val future = Future {
@@ -72,7 +88,13 @@ object CustomDataController extends Controller with Secured {
   }
 
   /**
-   * Delete custom data.
+   * Deletes a custom data field from the account's custom data.
+   * </pre>
+   * The actual removal operation is delegated to {@link CustomDataModel}.
+   * <pre/>
+   * This method is restricted to authenticated users only.
+   *
+   * @return the status of the removal operation
    */
   def deleteCustomDataItem(key: String) = IsAuthenticated { username => implicit request =>
     val future = Future {

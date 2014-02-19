@@ -16,13 +16,23 @@
 
 package models
 
-import scala.language.postfixOps
 import controllers.StormpathManager
 
+//The actual `User` holding some of the account's data such as email, full name, username and account custom data href
 case class User(email: String, fullName: String, username: String, customDataHref: String)
 
+/**
+ * Stateless domain object model creator representing a logged user in this sample application.
+ */
 object User {
-  
+
+  /**
+   * Simple operation that requests an actual user authentication to the {@link StormpathManager}.
+   *
+   * @param email the email of the user being authenticated
+   * @param password the password of the user being authenticated
+   * @return an `User` instance containing some of the account data, such as username, full name, username and account custom data href
+   */
   def authenticate(email: String, password: String): Option[User] = {
     StormpathManager.authenticate(email, password)
   }

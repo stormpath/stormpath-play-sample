@@ -82,9 +82,6 @@ class CustomData extends Backbone.View
     if @cdvalue == "" || @cdvalue.indexOf(" ") != -1
       alert "Custom data values cannot be empty nor contain spaces"
       return
-    if document.getElementById(@cdkey) != null
-      alert('Key already exists')
-      return
     r = jsRoutes.controllers.CustomDataController.addCustomDataItem()
     $.ajax
       url: r.url
@@ -94,6 +91,8 @@ class CustomData extends Backbone.View
         key: $("input[name=key]", form).val()
         value: $("input[name=value]", form).val()
       success: (tpl) ->
+        if document.getElementById(@cdkey) != null
+          document.querySelector('[customdata-item-id="'+ @cdkey + '"]').remove()
         customDataItem = new CustomDataItem(el: $(tpl))
         @$el.find("ul").append(customDataItem.el)
         form.find("input[type=text]").val("").first().focus()

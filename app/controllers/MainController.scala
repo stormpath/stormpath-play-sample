@@ -25,10 +25,20 @@ import models._
 import views._
 import scala.concurrent.Future
 
+/**
+ * The main controller handling login, logout and authentication actions.
+ *
+ */
 object MainController extends Controller {
 
-  var loggedUser : Option[User] = None
+  private var loggedUser : Option[User] = None
 
+  /**
+   * Creates the login form and authenticates the actual login request.
+   *
+   * @param request the request containing the login information
+   * @return the result of the authentication
+   */
   def loginForm(implicit request: Request[_]) = Form(
     tuple(
       "email" -> text,
@@ -50,6 +60,8 @@ object MainController extends Controller {
 
   /**
    * Handle login form submission.
+   *
+   * @return the CustomDataController's main page if the authentication has been successful, the login page otherwise
    */
   def authenticate = Action { implicit request =>
     loginForm.bindFromRequest.fold(
@@ -94,7 +106,7 @@ trait Secured {
   /**
    * Retrieve the connected user email.
    */
-  private def username(request: RequestHeader) = request.session.get("email")
+  private def email(request: RequestHeader) = request.session.get("email")
 
   /**
    * Redirect to login if the user in not authorized.
@@ -105,9 +117,9 @@ trait Secured {
    * Action for authenticated users.
    */
   def IsAuthenticated(f: => String => Request[AnyContent] => Future[SimpleResult]) =
-    Security.Authenticated(username, onUnauthorized) { user =>
+    Security.Authenticated(email, onUnauthorized) { user =>
     Action.async { request =>
-      username(request).map { login =>
+      email(request).map { login =>
         f(login)(request)
       }.getOrElse(Future.successful(onUnauthorized(request)))
     }
